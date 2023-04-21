@@ -2,7 +2,7 @@ package configs
 
 import (
     "context"
-    "fmt"
+    Logger "github.com/ragavan/go_logger"
     "log"
     "time"
     "go.mongodb.org/mongo-driver/mongo"
@@ -10,12 +10,14 @@ import (
 )
 
 func ConnectDB() *mongo.Client  {
+    ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+    logger := Logger.LoggerFromContext(ctx)
     client, err := mongo.NewClient(options.Client().ApplyURI(EnvMongoURI()))
     if err != nil {
         log.Fatal(err)
     }
 
-    ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+    
     err = client.Connect(ctx)
     if err != nil {
         log.Fatal(err)
@@ -26,7 +28,7 @@ func ConnectDB() *mongo.Client  {
     if err != nil {
         log.Fatal(err)
     }
-    fmt.Println("Connected to MongoDB")
+    logger.Info().Msg("Connected to MongoDB")
     return client
 }
 

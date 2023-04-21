@@ -3,11 +3,15 @@ package go_logger
 import (
 	"io"
 	"os"
+	"context"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
 	"github.com/ragavan/go_logger/model"
 )
-var logger *zerolog.Logger
+var (
+	logger *zerolog.Logger
+ )
+ 
 func Init(options model.LogOptions) (*zerolog.Logger, error) {
 	var logWriter io.Writer = os.Stdout
 	if options.Writer != nil {
@@ -50,10 +54,15 @@ func createLogger(writer io.Writer, level zerolog.Level) *zerolog.Logger {
 	return &log
 }
 
-func GetInstance() *zerolog.Logger {
-    return logger
+// ContextWithLogger adds logger to context
+func ContextWithLogger(ctx context.Context, l *zerolog.Logger) context.Context {
+	return context.WithValue(ctx, logger, l)
 }
 
-func SetInstance(loggr *zerolog.Logger) {
-    logger = loggr
+// LoggerFromContext returns logger from context
+func LoggerFromContext(ctx context.Context) *zerolog.Logger {
+	if l, ok := ctx.Value(logger).(*zerolog.Logger); ok {
+		return l
+	}
+	return InitDefault()
 }

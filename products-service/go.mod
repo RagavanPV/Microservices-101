@@ -2,6 +2,8 @@ module products-service
 
 go 1.19
 
+replace github.com/ragavan/go_logger => ../libraries/go_logger
+
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -19,7 +21,9 @@ require (
 	github.com/montanaflynn/stats v0.7.0 // indirect
 	github.com/philhofer/fwd v1.1.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/ragavan/go_logger v0.0.0-00010101000000-000000000000 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
+	github.com/rs/zerolog v1.29.1 // indirect
 	github.com/savsgio/dictpool v0.0.0-20221023140959-7bf2e61cea94 // indirect
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee // indirect
 	github.com/tinylib/msgp v1.1.8 // indirect
