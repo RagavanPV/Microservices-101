@@ -1,0 +1,4 @@
+.idea/*
+
+databases/products-mongo-data/**
+databases/auth-mysql-data/**

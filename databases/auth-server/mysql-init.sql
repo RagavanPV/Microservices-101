@@ -1,0 +1,6 @@
+BEGIN;
+
+CREATE DATABASE IF NOT EXISTS authDB;
+USE authDB;
+
+commit;

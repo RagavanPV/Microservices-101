@@ -1,0 +1,36 @@
+version: '3.9'
+services:
+  products-mongodb:
+    image : mongo
+    container_name: products-mongodb
+    ports:
+      - 27017:27017
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    networks:
+      - starter
+    restart: unless-stopped
+    volumes:
+      - ./products-mongo-data:/data/db
+      - ./products-service/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+  auth-mysql:
+    container_name: auth-mysql
+    image: mysql:5.7
+    ports:
+      - '33060:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - starter
+    restart: unless-stopped
+    command: --init-file /docker-entrypoint-initdb.d/auth-mysql/mysql-init.sql
+    volumes:
+      - ./auth-mysql-data:/var/lib/mysql-files
+      - ./auth-server/mysql-init.sql:/docker-entrypoint-initdb.d/auth-mysql/mysql-init.sql
+networks:
+  starter:
+    driver: bridge
+
