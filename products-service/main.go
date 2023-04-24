@@ -14,7 +14,7 @@ func main() {
     app := fiber.New()
     ctx := context.Background()
     runLogFile, _ := os.OpenFile(
-        "products-service.log",
+        "logs/products-service.log",
         os.O_APPEND|os.O_CREATE|os.O_WRONLY,
         0664,
     )

@@ -4,6 +4,12 @@ github.com/RagavanPV/Microservices-101/libraries/go_logger v0.0.0-20230424064349
 github.com/RagavanPV/Microservices-101/libraries/go_logger v0.0.0-20230424064349-4acd1a8b70a4/go.mod h1:CDKokVECY1RSFRxBOpQ6pEeP1z4ipA8R5EDTpK5dpzY=
 github.com/RagavanPV/Microservices-101/libraries/go_logger v0.0.0-20230424064722-7aa1610ccb57 h1:yGuUwr9xBOzUyI028QhSC0AbqytbuRFjzWvpSJj0o3I=
 github.com/RagavanPV/Microservices-101/libraries/go_logger v0.0.0-20230424064722-7aa1610ccb57/go.mod h1:CDKokVECY1RSFRxBOpQ6pEeP1z4ipA8R5EDTpK5dpzY=
+github.com/RagavanPV/Microservices-101/libraries/go_logger v0.0.0-20230424065455-6fbaacbdcaf0 h1:kcwQdaNqRpDjOSBb+/ecOg4DQxxprYV6ms+83A29caw=
+github.com/RagavanPV/Microservices-101/libraries/go_logger v0.0.0-20230424065455-6fbaacbdcaf0/go.mod h1:CDKokVECY1RSFRxBOpQ6pEeP1z4ipA8R5EDTpK5dpzY=
+github.com/RagavanPV/Microservices-101/libraries/go_logger v0.0.0-20230424065703-7dc4641ac8ae h1:L4oAdXzUyON35Wt96vpTAw4uItgrZ7nU5HY3OJ68ecw=
+github.com/RagavanPV/Microservices-101/libraries/go_logger v0.0.0-20230424065703-7dc4641ac8ae/go.mod h1:CDKokVECY1RSFRxBOpQ6pEeP1z4ipA8R5EDTpK5dpzY=
+github.com/RagavanPV/Microservices-101/libraries/go_logger v0.0.0-20230424065813-950aa07bfbef h1:u+E1OQJdSZmLxyyF4AxpGtMFRkZ6b/oIjWTInkm2dkQ=
+github.com/RagavanPV/Microservices-101/libraries/go_logger v0.0.0-20230424065813-950aa07bfbef/go.mod h1:CDKokVECY1RSFRxBOpQ6pEeP1z4ipA8R5EDTpK5dpzY=
 github.com/andybalholm/brotli v1.0.5 h1:8uQZIdzKmjc/iuPu7O2ioW48L81FgatrcpfFmiq/cCs=
 github.com/andybalholm/brotli v1.0.5/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHGRSepvi9Eig=
 github.com/coreos/go-systemd/v22 v22.5.0/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=

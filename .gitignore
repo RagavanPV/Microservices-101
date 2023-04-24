@@ -4,3 +4,4 @@ databases/products-mongo-data/**
 databases/auth-mysql-data/**
 
 **/.DS_Store
+**.log

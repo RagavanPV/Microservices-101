@@ -7,6 +7,12 @@ services:
             - ./logs/:/logs/
         ports:
             - 6000:6000
+    auth-server:
+        image: auth-server:latest
+        volumes:
+            - ./logs/:/logs/
+        ports:
+            - 5001:5000
 
     elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
