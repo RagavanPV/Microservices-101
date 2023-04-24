@@ -2,7 +2,7 @@ package configs
 
 import (
     "context"
-    Logger "github.com/ragavan/go_logger"
+    Logger "github.com/RagavanPV/Microservices-101/libraries/go_logger"
     "log"
     "time"
     "go.mongodb.org/mongo-driver/mongo"

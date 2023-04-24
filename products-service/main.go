@@ -5,8 +5,8 @@ import (
     "products-service/configs"
     "products-service/routes"
     "github.com/gofiber/fiber/v2" 
-    Logger "github.com/ragavan/go_logger"
-    LoggerModel "github.com/ragavan/go_logger/model"
+    Logger "github.com/RagavanPV/Microservices-101/libraries/go_logger"
+    LoggerModel "github.com/RagavanPV/Microservices-101/libraries/go_logger/model"
 )
 
 func main() {
