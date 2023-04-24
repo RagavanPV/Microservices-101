@@ -6,7 +6,7 @@ import (
 	"context"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
-	"github.com/ragavan/go_logger/model"
+	"model"
 )
 var (
 	logger *zerolog.Logger
