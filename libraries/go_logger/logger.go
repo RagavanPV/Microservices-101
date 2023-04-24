@@ -67,6 +67,6 @@ func LoggerFromContext(ctx context.Context) *zerolog.Logger {
 	return InitDefault()
 }
 
-func MultiLevelWriter(writers ...io.Writer) *zerolog.MultiLevelWriter {
+func MultiLevelWriter(writers ...io.Writer) *zerolog.LevelWriter {
 	return zerolog.MultiLevelWriter(writers...)
 }
