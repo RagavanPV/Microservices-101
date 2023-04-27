@@ -1,12 +1,15 @@
 import os
 from flask import Flask
+from gevent.pywsgi import WSGIServer
 from .models import db
 from .oauth2 import config_oauth
 from .routes import bp
+from urllib.request import urlopen
 
 
 def create_app(config=None):
     app = Flask(__name__)
+    os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
 
     # load default configuration
     app.config.from_object('website.settings')
@@ -23,6 +26,11 @@ def create_app(config=None):
             app.config.from_pyfile(config)
 
     setup_app(app)
+    # Debug/Development
+    # app.run(debug=True, host="0.0.0.0", port="5000")
+    # Production
+    http_server = WSGIServer(('127.0.0.1', 5000), app)
+    http_server.serve_forever()
     return app
 
 
