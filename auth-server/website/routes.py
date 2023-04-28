@@ -127,3 +127,11 @@ def revoke_token():
 def api_me():
     user = current_token.user
     return jsonify(id=user.id, username=user.username)
+
+@bp.route('/actuator/health/liveness')
+def liveness_check():
+    return {"status": "UP","components": {"livenessstate": {"status": "UP"}}}
+
+@bp.route('/actuator/health/readiness')
+def readiness_check():
+    return {"status": "UP","components": {"readinessstate": {"status": "UP"}}}

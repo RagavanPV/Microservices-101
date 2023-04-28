@@ -1,5 +1,5 @@
 gevent
-Flask
+Flask==2.2.3
 Flask-SQLAlchemy
 Authlib
 pymysql

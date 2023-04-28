@@ -53,16 +53,6 @@ class Logger:
                     "formatter": "standard",
                     "class": "logging.StreamHandler",
                     "stream": "ext://sys.stdout"
-                },
-                "file": {  
-                    "class": "logging.handlers.RotatingFileHandler",
-                    "formatter": "standard",
-                    "level": "INFO",
-                    'filename': '/logs/' + self.__name + 'info.log',
-                    "mode": "a",
-                    "encoding": "utf-8",
-                    "maxBytes": 500000,
-                    "backupCount": 4
                 }
             },
             "loggers": {
