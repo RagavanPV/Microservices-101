@@ -40,19 +40,3 @@ dependencies:
     version: "13.10.1"
     repository: "https://charts.bitnami.com/bitnami"
     condition: mongodb.enabled
-  - name: elasticsearch
-    version: ^7.10.0
-    repository: https://helm.elastic.co
-    condition: elasticsearch.enabled
-  - name: kibana
-    version: ^7.10.0
-    repository: https://helm.elastic.co
-    condition: kibana.enabled
-  - name: filebeat
-    version: ^7.10.0
-    repository: https://helm.elastic.co
-    condition: filebeat.enabled
-  - name: logstash
-    version: ^7.10.0
-    repository: https://helm.elastic.co
-    condition: logstash.enabled

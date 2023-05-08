@@ -99,45 +99,6 @@ mongodb:
           $MONGODB_BIN_DIR/mongosh admin --host 127.0.0.1 --port $MONGODB_PORT_NUMBER -u $MONGODB_ROOT_USER -p $MONGODB_ROOT_PASSWORD << EOF
           db.createUser({ user: "admin" , pwd: "password1", roles: ["userAdminAnyDatabase", "dbAdminAnyDatabase", "readWriteAnyDatabase"]})
           EOF
-
-
-elasticsearch:
-  enabled: false
-kibana:
-  enabled: false
-  env:
-    ELASTICSEARCH_HOSTS: http://{{ .Release.Name }}-elasticsearch-client:9200
-nginx_ldapauth_proxy:
-  enabled: false
-  service:
-    type: ClusterIP
-    externalPort: 5601
-  proxy:
-    port: 443
-    host: "e-commerce-kibana"
-    authName: "admin"
-    ldapHost: "e-commerce-openldap"
-    ldapDN: "dc=ldap,dc=cetic,dc=be"
-    ldapFilter: "objectClass=organizationalPerson"
-    ldapBindDN: "cn=admin,dc=ldap,dc=cetic,dc=be"
-    requires:
-      - name: "admin"
-        filter: "cn=admin,dc=ldap,dc=cetic,dc=be"
-  secrets:
-    ldapBindPassword: "password1"
-logstash:
-  enabled: false
-  elasticsearch:
-    host: e-commerce-elasticsearch-client
-filebeat:
-  enabled: false
-  config:
-    output.file.enabled: false
-    output.logstash:
-      hosts: ["e-commerce-logstash:5044"]
-  indexTemplateLoad:
-   - e-commerce-elasticsearch-client:9200
-
 auth-server:
   enabled: true
 products-service:

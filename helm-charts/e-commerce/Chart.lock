@@ -11,17 +11,5 @@ dependencies:
 - name: mongodb
   repository: https://charts.bitnami.com/bitnami
   version: 13.10.1
-- name: elasticsearch
-  repository: https://helm.elastic.co
-  version: 7.17.3
-- name: kibana
-  repository: https://helm.elastic.co
-  version: 7.17.3
-- name: filebeat
-  repository: https://helm.elastic.co
-  version: 7.17.3
-- name: logstash
-  repository: https://helm.elastic.co
-  version: 7.17.3
-digest: sha256:e60d3b135a00a9f763b7a3810bc4c542ed01ac9909dda0c25e0f57e52770879b
-generated: "2023-04-28T20:16:34.509397+05:30"
+digest: sha256:abdba169b21d246c0d2b7b1368867f0830c2bcdcbe3f489cfc7979c307fec3ff
+generated: "2023-05-08T18:23:38.899179+05:30"
