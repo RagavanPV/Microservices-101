@@ -1,0 +1,107 @@
+replicas: 1
+
+image: "docker.elastic.co/logstash/logstash"
+imageTag: "8.0.0-SNAPSHOT"
+imagePullPolicy: "IfNotPresent"
+imagePullSecrets: []
+
+logstashJavaOpts: "-Xmx1g -Xms1g"
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "1536Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1536Mi"
+
+volumeClaimTemplate:
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 1Gi
+
+persistence:
+  enabled: true
+
+logstashConfig:
+  logstash.yml: |
+    http.host: 0.0.0.0
+    xpack.monitoring.enabled: true
+    xpack.monitoring.elasticsearch.username: '${ELASTICSEARCH_USERNAME}'
+    xpack.monitoring.elasticsearch.password: '${ELASTICSEARCH_PASSWORD}'
+    xpack.monitoring.elasticsearch.hosts: ["https://elastic:9200"]
+    xpack.monitoring.elasticsearch.ssl.certificate_authority: /usr/share/logstash/config/certs/elastic-certificate.crt
+
+logstashPipeline:
+  uptime.conf: |
+    input {
+      beats {
+        port => 5044
+      }
+    }
+
+    filter {
+      json {
+        source => "message"
+      }
+
+      mutate {
+        remove_field => "host.name"
+        remove_field => "@metadata"
+        remove_field => "@version"
+        remove_field => "stream"
+        remove_field => "_type"
+        remove_field => "_score"
+        remove_field => "input.type"
+        remove_field => "agent.id"
+        remove_field => "agent.name"
+        remove_field => "agent.type"
+        remove_field => "agent.version"
+        remove_field => "agent.ephemeral_id"
+        remove_field => "log.file.path"
+        remove_field => "type"
+      }
+    }
+
+    output {
+      elasticsearch {
+        hosts => ["https://elastic:9200"]
+        cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+        user => '${ELASTICSEARCH_USERNAME}'
+        password => '${ELASTICSEARCH_PASSWORD}'
+        index => "logstash-%{+YYYY.MM.dd}"
+      }
+    }
+
+secretMounts:
+  - name: elastic-certificate-crt
+    secretName: elastic-certificate-crt
+    path: /usr/share/logstash/config/certs
+
+extraEnvs:
+  - name: 'ELASTICSEARCH_USERNAME'
+    valueFrom:
+      secretKeyRef:
+        name: elastic-credentials
+        key: username
+  - name: 'ELASTICSEARCH_PASSWORD'
+    valueFrom:
+      secretKeyRef:
+        name: elastic-credentials
+        key: password
+
+# tolerations:
+# - key: env
+#   operator: Equal
+#   value: misc
+#   effect: NoSchedule
+# affinity:
+#   nodeAffinity:
+#     requiredDuringSchedulingIgnoredDuringExecution:
+#       nodeSelectorTerms:
+#       - matchExpressions:
+#         - key: env
+#           operator: In
+#           values:
+#           - misc

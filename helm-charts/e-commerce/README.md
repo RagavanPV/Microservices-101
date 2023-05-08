@@ -1,0 +1,1 @@
+helm install e-commerce-release . --namespace e-commerce --create-namespace --wait -f values.yaml

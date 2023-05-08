@@ -26,15 +26,8 @@ serviceAccount:
 podAnnotations: {}
 
 podSecurityContext: {}
-  # fsGroup: 2000
 
 securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
 
 service:
   type: ClusterIP
@@ -100,43 +93,278 @@ mongodb:
           db.createUser({ user: "admin" , pwd: "password1", roles: ["userAdminAnyDatabase", "dbAdminAnyDatabase", "readWriteAnyDatabase"]})
           EOF
 
+elasticsearch: 
+  enabled: true
+  nameOverride: "elastic"
+  fullnameOverride: "elastic"
+  replicas: 3
+  clusterName: "e-commerce"
+  nodeGroup: "master"
+  image: "docker.elastic.co/elasticsearch/elasticsearch"
+  imageTag: "8.0.0-SNAPSHOT"
+  imagePullPolicy: "IfNotPresent"
+  updateStrategy: RollingUpdate
+  esJavaOpts: "-Xmx1g -Xms1g"
+  roles:
+    - 'master'
+    - 'ingest'
+    - 'data'
+  protocol: https
+  esConfig:
+    elasticsearch.yml: |
+      xpack.security.enabled: true
+      xpack.security.transport.ssl.enabled: true
+      xpack.security.transport.ssl.verification_mode: certificate
+      xpack.security.transport.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+      xpack.security.transport.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+      xpack.security.http.ssl.enabled: true
+      xpack.monitoring.collection.enabled: true
+      xpack.security.http.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+      xpack.security.http.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+  extraEnvs:
+    - name: ELASTIC_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: elastic-credentials
+          key: password
+    - name: ELASTIC_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: elastic-credentials
+          key: username
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1Gi"
+    limits:
+      cpu: "100m"
+      memory: "1Gi"
+  readinessProbe:
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    successThreshold: 3
+    timeoutSeconds: 5
 
-elasticsearch:
-  enabled: false
+logstash:
+  enabled: true
+  replicas: 1
+  image: "docker.elastic.co/logstash/logstash"
+  imageTag: "8.0.0-SNAPSHOT"
+  imagePullPolicy: "IfNotPresent"
+  imagePullSecrets: []
+  logstashJavaOpts: "-Xmx1g -Xms1g"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1Gi"
+    limits:
+      cpu: "100m"
+      memory: "1Gi"
+  volumeClaimTemplate:
+    accessModes: [ "ReadWriteOnce" ]
+    resources:
+      requests:
+        storage: 1Gi
+  persistence:
+    enabled: true
+  logstashConfig:
+    logstash.yml: |
+      http.host: 0.0.0.0
+      xpack.monitoring.enabled: true
+      xpack.monitoring.elasticsearch.username: '${ELASTICSEARCH_USERNAME}'
+      xpack.monitoring.elasticsearch.password: '${ELASTICSEARCH_PASSWORD}'
+      xpack.monitoring.elasticsearch.hosts: ["https://elastic:9200"]
+      xpack.monitoring.elasticsearch.ssl.certificate_authority: /usr/share/logstash/config/certs/elastic-certificate.crt
+  logstashPipeline:
+    uptime.conf: |
+      input {
+        beats {
+          port => 5044
+        }
+      }
+
+      filter {
+        json {
+          source => "message"
+        }
+
+        mutate {
+          remove_field => "host.name"
+          remove_field => "@metadata"
+          remove_field => "@version"
+          remove_field => "stream"
+          remove_field => "_type"
+          remove_field => "_score"
+          remove_field => "input.type"
+          remove_field => "agent.id"
+          remove_field => "agent.name"
+          remove_field => "agent.type"
+          remove_field => "agent.version"
+          remove_field => "agent.ephemeral_id"
+          remove_field => "log.file.path"
+          remove_field => "type"
+        }
+      }
+
+      output {
+        elasticsearch {
+          hosts => ["https://elastic:9200"]
+          cacert => "/usr/share/logstash/config/certs/elastic-certificate.crt"
+          user => '${ELASTICSEARCH_USERNAME}'
+          password => '${ELASTICSEARCH_PASSWORD}'
+          index => "logstash-%{+YYYY.MM.dd}"
+        }
+      }
+  secretMounts:
+    - name: elastic-certificate-crt
+      secretName: elastic-certificate-crt
+      path: /usr/share/logstash/config/certs
+  extraEnvs:
+    - name: 'ELASTICSEARCH_USERNAME'
+      valueFrom:
+        secretKeyRef:
+          name: elastic-credentials
+          key: username
+    - name: 'ELASTICSEARCH_PASSWORD'
+      valueFrom:
+        secretKeyRef:
+          name: elastic-credentials
+          key: password
+
+filebeat:
+  enabled: true
+  image: "docker.elastic.co/beats/filebeat"
+  imageTag: "8.0.0-SNAPSHOT"
+  imagePullPolicy: "IfNotPresent"
+  nameOverride: "filebeat"
+  fullnameOverride: "filebeat"
+  updateStrategy: RollingUpdate
+  filebeatConfig:
+    filebeat.yml: |
+      filebeat.autodiscover:
+        providers:
+          - type: kubernetes
+            templates:
+              - condition.and:
+                - contains:
+                    kubernetes.labels.chart: logstash
+                config:
+                  - type: container
+                    paths:
+                      - /var/log/containers/*-${data.kubernetes.container.id}.log
+                    exclude_lines: ["^\\s+[\\-`('.|_]"]
+
+      setup.kibana:
+        hosts: "kibana:5601"
+
+      output.kafka:
+        hosts: ["kafka:9092"]
+        topic: 'ohcore-logs'
+        partition.round_robin:
+          reachable_only: false
+        required_acks: 1
+        compression: gzip
+        max_message_bytes: 1000000
+  livenessProbe:
+    exec:
+      command:
+        - sh
+        - -c
+        - |
+          #!/usr/bin/env bash -e
+          curl --fail 127.0.0.1:5066
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+  readinessProbe:
+    exec:
+      command:
+        - sh
+        - -c
+        - |
+          #!/usr/bin/env bash -e
+          filebeat test output
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "100Mi"
+    limits:
+      cpu: "150m"
+      memory: "200Mi"
+
 kibana:
   enabled: false
-  env:
-    ELASTICSEARCH_HOSTS: http://{{ .Release.Name }}-elasticsearch-client:9200
-nginx_ldapauth_proxy:
-  enabled: false
+  nameOverride: "kibana"
+  fullnameOverride: "kibana"
+  elasticsearchHosts: "https://elastic:9200"
+  replicas: 1
+  image: "docker.elastic.co/kibana/kibana"
+  imageTag: "8.0.0-SNAPSHOT"
+  imagePullPolicy: "IfNotPresent"
   service:
-    type: ClusterIP
-    externalPort: 5601
-  proxy:
-    port: 443
-    host: "e-commerce-kibana"
-    authName: "admin"
-    ldapHost: "e-commerce-openldap"
-    ldapDN: "dc=ldap,dc=cetic,dc=be"
-    ldapFilter: "objectClass=organizationalPerson"
-    ldapBindDN: "cn=admin,dc=ldap,dc=cetic,dc=be"
-    requires:
-      - name: "admin"
-        filter: "cn=admin,dc=ldap,dc=cetic,dc=be"
-  secrets:
-    ldapBindPassword: "password1"
-logstash:
+    type: NodePort
+    port: 5601
+    labels: {}
+    annotations: {}
+    loadBalancerSourceRanges: []
+  ingress:
+    enabled: true
+    annotations: {}
+    hosts:
+      - host: kibana.vaishal.repricing.in
+    tls: []
+  extraEnvs:
+    - name: 'ELASTICSEARCH_USERNAME'
+      valueFrom:
+        secretKeyRef:
+          name: elastic-credentials
+          key: username
+    - name: 'ELASTICSEARCH_PASSWORD'
+      valueFrom:
+        secretKeyRef:
+          name: elastic-credentials
+          key: password
+    - name: 'KIBANA_ENCRYPTION_KEY'
+      valueFrom:
+        secretKeyRef:
+          name: kibana
+          key: encryptionkey
+  kibanaConfig:
+    kibana.yml: |
+      server.ssl:
+        enabled: true
+        key: /usr/share/kibana/config/certs/elastic-certificate.pem
+        certificate: /usr/share/kibana/config/certs/elastic-certificate.pem
+      xpack.security.encryptionKey: ${KIBANA_ENCRYPTION_KEY}
+      elasticsearch.ssl:
+        certificateAuthorities: /usr/share/kibana/config/certs/elastic-certificate.pem
+        verificationMode: certificate
+  protocol: https
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1Gi"
+    limits:
+      cpu: "100m"
+      memory: "1Gi"
+  readinessProbe:
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    successThreshold: 3
+    timeoutSeconds: 5
+
+metricbeat:
   enabled: false
-  elasticsearch:
-    host: e-commerce-elasticsearch-client
-filebeat:
+
+apm-server:
   enabled: false
-  config:
-    output.file.enabled: false
-    output.logstash:
-      hosts: ["e-commerce-logstash:5044"]
-  indexTemplateLoad:
-   - e-commerce-elasticsearch-client:9200
 
 auth-server:
   enabled: true

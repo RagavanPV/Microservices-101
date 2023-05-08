@@ -13,15 +13,21 @@ dependencies:
   version: 13.10.1
 - name: elasticsearch
   repository: https://helm.elastic.co
-  version: 7.17.3
-- name: kibana
-  repository: https://helm.elastic.co
-  version: 7.17.3
+  version: 8.5.1
 - name: filebeat
   repository: https://helm.elastic.co
-  version: 7.17.3
+  version: 8.5.1
+- name: kibana
+  repository: https://helm.elastic.co
+  version: 8.5.1
 - name: logstash
   repository: https://helm.elastic.co
-  version: 7.17.3
-digest: sha256:e60d3b135a00a9f763b7a3810bc4c542ed01ac9909dda0c25e0f57e52770879b
-generated: "2023-04-28T20:16:34.509397+05:30"
+  version: 8.5.1
+- name: metricbeat
+  repository: https://helm.elastic.co
+  version: 8.5.1
+- name: apm-server
+  repository: https://helm.elastic.co
+  version: 8.5.1
+digest: sha256:c405aa8330c0521c1a7c6a03cb60ff8470aff450c84136ac17a558871f77f8e8
+generated: "2023-05-05T12:36:12.029848+05:30"

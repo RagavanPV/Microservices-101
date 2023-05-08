@@ -41,18 +41,26 @@ dependencies:
     repository: "https://charts.bitnami.com/bitnami"
     condition: mongodb.enabled
   - name: elasticsearch
-    version: ^7.10.0
     repository: https://helm.elastic.co
+    version: 8.5.1
     condition: elasticsearch.enabled
-  - name: kibana
-    version: ^7.10.0
-    repository: https://helm.elastic.co
-    condition: kibana.enabled
   - name: filebeat
-    version: ^7.10.0
     repository: https://helm.elastic.co
+    version: 8.5.1
     condition: filebeat.enabled
-  - name: logstash
-    version: ^7.10.0
+  - name: kibana
     repository: https://helm.elastic.co
+    version: 8.5.1
+    condition: kibana.enabled
+  - name: logstash
+    repository: https://helm.elastic.co
+    version: 8.5.1
     condition: logstash.enabled
+  - name: metricbeat
+    repository: https://helm.elastic.co
+    version: 8.5.1
+    condition: metricbeat.enabled
+  - name: apm-server
+    repository: https://helm.elastic.co
+    version: 8.5.1
+    condition: apm-server.enabled
