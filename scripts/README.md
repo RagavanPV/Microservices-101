@@ -1,0 +1,1 @@
+Download files from https://www.kaggle.com/datasets/lokeshparab/amazon-products-dataset and execute the script

@@ -2,6 +2,9 @@
 
 docker-compose/databases/products-mongo-data/**
 docker-compose/databases/auth-mysql-data/**
+docker-compose/elastic-stack/es-certs/**
+docker-compose/elastic-stack/kibana-certs/**
+docker-compose/elastic-stack/kibana-data/**
 
 **/.DS_Store
 **.log
