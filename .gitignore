@@ -1,12 +1,8 @@
 .idea/*
 
-docker-compose/databases/products-mongo-data/**
-docker-compose/databases/auth-mysql-data/**
-docker-compose/elastic-stack/es-certs/**
-docker-compose/elastic-stack/es-data*/**
-docker-compose/elastic-stack/sist2-data*/**
-docker-compose/elastic-stack/kibana-certs/**
-docker-compose/elastic-stack/kibana-data/**
+docker-compose/databases/data/**
+docker-compose/elastic-stack/certs/**
+docker-compose/elastic-stack/data/**
 
 **/.DS_Store
 **.log

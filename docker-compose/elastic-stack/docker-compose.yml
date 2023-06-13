@@ -4,8 +4,8 @@ services:
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
-      - ./es-certs:/usr/share/elasticsearch/config/es-certs
-      - ./kibana-certs:/usr/share/elasticsearch/config/kibana-certs
+      - ./certs/es-certs:/usr/share/elasticsearch/config/es-certs
+      - ./certs/kibana-certs:/usr/share/elasticsearch/config/kibana-certs
     user: "0"
     command: >
       bash -c '
@@ -72,8 +72,8 @@ services:
         condition: service_healthy
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
-      - ./es-certs:/usr/share/elasticsearch/config/certs
-      - ./es-data01:/usr/share/elasticsearch/data
+      - ./certs/es-certs:/usr/share/elasticsearch/config/certs
+      - ./data/es-data01:/usr/share/elasticsearch/data
     ports:
       - ${ES_PORT}:9200
     environment:
@@ -115,8 +115,8 @@ services:
       - es01
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
-      - ./es-certs:/usr/share/elasticsearch/config/certs
-      - ./es-data02:/usr/share/elasticsearch/data
+      - ./certs/es-certs:/usr/share/elasticsearch/config/certs
+      - ./data/es-data02:/usr/share/elasticsearch/data
     environment:
       - node.name=es02
       - cluster.name=${CLUSTER_NAME}
@@ -155,8 +155,8 @@ services:
       - es02
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
-      - ./es-certs:/usr/share/elasticsearch/config/certs
-      - ./es-data03:/usr/share/elasticsearch/data
+      - ./certs/es-certs:/usr/share/elasticsearch/config/certs
+      - ./data/es-data03:/usr/share/elasticsearch/data
     environment:
       - node.name=es03
       - cluster.name=${CLUSTER_NAME}
@@ -200,8 +200,8 @@ services:
         condition: service_healthy
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
     volumes:
-      - ./kibana-certs:/usr/share/kibana/config/certs
-      - ./kibana-data:/usr/share/kibana/data
+      - ./certs/kibana-certs:/usr/share/kibana/config/certs
+      - ./data/kibana-data:/usr/share/kibana/data
     ports:
       - ${KIBANA_PORT}:5601
     environment:
@@ -225,7 +225,7 @@ services:
     image: simon987/sist2:3.1.0-x64-linux
     restart: unless-stopped
     volumes:
-      - ./sist2-data/:/sist2-admin/
+      - ./data/sist2-data/:/sist2-admin/
       - /:/host
     ports:
       - 4090:4090 # sist2
@@ -241,5 +241,5 @@ volumes:
     driver: local
   es-data03:
     driver: local
-  kibanadata:
+  kibana-data:
     driver: local

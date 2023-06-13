@@ -4,7 +4,7 @@ services:
     container_name: mongo1
     image: mongo
     volumes:
-      - ./products-mongo-data/mongors/data1:/data/db
+      - ./data/mongo/mongo1:/data/db
       - ./products-service/rs-init.sh:/scripts/rs-init.sh
       - ./products-service/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     networks:
@@ -28,7 +28,7 @@ services:
     container_name: mongo2
     image: mongo
     volumes:
-      - ./products-mongo-data/mongors/data2:/data/db
+      - ./data/mongo/mongo2:/data/db
     networks:
       - mongors-network
     ports:
@@ -47,7 +47,7 @@ services:
     container_name: mongo3
     image: mongo
     volumes:
-      - ./products-mongo-data/mongors/data3:/data/db
+      - ./data/mongo/mongo3:/data/db
     networks:
       - mongors-network
     ports:
@@ -74,7 +74,7 @@ services:
     restart: unless-stopped
     command: --init-file /docker-entrypoint-initdb.d/auth-mysql/mysql-init.sql
     volumes:
-      - ./auth-mysql-data:/var/lib/mysql-files
+      - ./data/mysql:/var/lib/mysql-files
       - ./auth-server/mysql-init.sql:/docker-entrypoint-initdb.d/auth-mysql/mysql-init.sql
 networks:
   mysql-network:
