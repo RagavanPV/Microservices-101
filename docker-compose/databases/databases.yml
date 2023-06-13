@@ -1,21 +1,67 @@
 version: '3.9'
 services:
-  products-mongodb:
-    image : mongo
-    container_name: products-mongodb
+  mongo1:
+    container_name: mongo1
+    image: mongo
+    volumes:
+      - ./products-mongo-data/mongors/data1:/data/db
+      - ./products-service/rs-init.sh:/scripts/rs-init.sh
+      - ./products-service/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - mongors-network
     ports:
-      - 27017:27017
+      - 27021:27017
     environment:
       - PUID=1000
       - PGID=1000
+      - MONGODB_REPLICA_SET_MODE=primary
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+      - MONGODB_PORT_NUMBER=27021
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=admin
-    networks:
-      - starter
-    restart: unless-stopped
+    links:
+      - mongo2
+      - mongo3
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+  mongo2:
+    container_name: mongo2
+    image: mongo
     volumes:
-      - ./products-mongo-data:/data/db
-      - ./products-service/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./products-mongo-data/mongors/data2:/data/db
+    networks:
+      - mongors-network
+    ports:
+      - 27022:27017
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - MONGODB_REPLICA_SET_MODE=secondary
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+      - MONGODB_PORT_NUMBER=27022
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+  mongo3:
+    container_name: mongo3
+    image: mongo
+    volumes:
+      - ./products-mongo-data/mongors/data3:/data/db
+    networks:
+      - mongors-network
+    ports:
+      - 27023:27017
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - MONGODB_REPLICA_SET_MODE=secondary
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+      - MONGODB_PORT_NUMBER=27023
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
   auth-mysql:
     container_name: auth-mysql
     image: mysql:5.7
@@ -24,13 +70,15 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password1
     networks:
-      - starter
+      - mysql-network
     restart: unless-stopped
     command: --init-file /docker-entrypoint-initdb.d/auth-mysql/mysql-init.sql
     volumes:
       - ./auth-mysql-data:/var/lib/mysql-files
       - ./auth-server/mysql-init.sql:/docker-entrypoint-initdb.d/auth-mysql/mysql-init.sql
 networks:
-  starter:
+  mysql-network:
+    driver: bridge
+  mongors-network:
     driver: bridge
 

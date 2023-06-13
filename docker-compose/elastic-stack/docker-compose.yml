@@ -4,7 +4,8 @@ services:
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
-      - certs:/usr/share/elasticsearch/config/certs
+      - ./es-certs:/usr/share/elasticsearch/config/es-certs
+      - ./kibana-certs:/usr/share/elasticsearch/config/kibana-certs
     user: "0"
     command: >
       bash -c '
@@ -15,12 +16,12 @@ services:
           echo "Set the KIBANA_PASSWORD environment variable in the .env file";
           exit 1;
         fi;
-        if [ ! -f config/certs/ca.zip ]; then
+        if [ ! -f config/es-certs/ca.zip ]; then
           echo "Creating CA";
-          bin/elasticsearch-certutil ca --silent --pem -out config/certs/ca.zip;
-          unzip config/certs/ca.zip -d config/certs;
+          bin/elasticsearch-certutil ca --silent --pem -out config/es-certs/ca.zip;
+          unzip config/es-certs/ca.zip -d config/es-certs;
         fi;
-        if [ ! -f config/certs/certs.zip ]; then
+        if [ ! -f config/es-certs/certs.zip ]; then
           echo "Creating certs";
           echo -ne \
           "instances:\n"\
@@ -42,22 +43,25 @@ services:
           "      - localhost\n"\
           "    ip:\n"\
           "      - 127.0.0.1\n"\
-          > config/certs/instances.yml;
-          bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
-          unzip config/certs/certs.zip -d config/certs;
+          > config/es-certs/instances.yml;
+          bin/elasticsearch-certutil cert --silent --pem -out config/es-certs/certs.zip --in config/es-certs/instances.yml --ca-cert config/es-certs/ca/ca.crt --ca-key config/es-certs/ca/ca.key;
+          unzip config/es-certs/certs.zip -d config/es-certs;
+          bin/elasticsearch-certutil cert --silent --pem -out config/kibana-certs/certs.zip --ca-cert config/kibana-certs/ca/ca.crt --ca-key config/kibana-certs/ca/ca.key;
+          unzip config/kibana-certs/certs.zip -d config/kibana-certs;
         fi;
         echo "Setting file permissions"
-        chown -R root:root config/certs;
+        chown -R root:root config/es-certs;
+        chown -R root:root config/kibana-certs;
         find . -type d -exec chmod 750 \{\} \;;
         find . -type f -exec chmod 640 \{\} \;;
         echo "Waiting for Elasticsearch availability";
-        until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
+        until curl -s --cacert config/es-certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
         echo "Setting kibana_system password";
-        until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
+        until curl -s -X POST --cacert config/es-certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
         echo "All done!";
       '
     healthcheck:
-      test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
+      test: ["CMD-SHELL", "[ -f config/es-certs/es01/es01.crt ]"]
       interval: 1s
       timeout: 5s
       retries: 120
@@ -68,8 +72,8 @@ services:
         condition: service_healthy
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
-      - certs:/usr/share/elasticsearch/config/certs
-      - esdata01:/usr/share/elasticsearch/data
+      - ./es-certs:/usr/share/elasticsearch/config/certs
+      - ./esdata01:/usr/share/elasticsearch/data
     ports:
       - ${ES_PORT}:9200
     environment:
@@ -90,6 +94,7 @@ services:
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.license.self_generated.type=${LICENSE}
+      - xpack.monitoring.collection.enabled=true
     mem_limit: ${MEM_LIMIT}
     ulimits:
       memlock:
@@ -110,8 +115,8 @@ services:
       - es01
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
-      - certs:/usr/share/elasticsearch/config/certs
-      - esdata02:/usr/share/elasticsearch/data
+      - ./es-certs:/usr/share/elasticsearch/config/certs
+      - ./esdata02:/usr/share/elasticsearch/data
     environment:
       - node.name=es02
       - cluster.name=${CLUSTER_NAME}
@@ -129,6 +134,7 @@ services:
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.license.self_generated.type=${LICENSE}
+      - xpack.monitoring.collection.enabled=true
     mem_limit: ${MEM_LIMIT}
     ulimits:
       memlock:
@@ -149,8 +155,8 @@ services:
       - es02
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
-      - certs:/usr/share/elasticsearch/config/certs
-      - esdata03:/usr/share/elasticsearch/data
+      - ./es-certs:/usr/share/elasticsearch/config/certs
+      - ./esdata03:/usr/share/elasticsearch/data
     environment:
       - node.name=es03
       - cluster.name=${CLUSTER_NAME}
@@ -168,6 +174,7 @@ services:
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.license.self_generated.type=${LICENSE}
+      - xpack.monitoring.collection.enabled=true
     mem_limit: ${MEM_LIMIT}
     ulimits:
       memlock:
@@ -193,8 +200,8 @@ services:
         condition: service_healthy
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
     volumes:
-      - certs:/usr/share/kibana/config/certs
-      - kibanadata:/usr/share/kibana/data
+      - ./kibana-certs:/usr/share/kibana/config/certs
+      - ./kibana-data:/usr/share/kibana/data
     ports:
       - ${KIBANA_PORT}:5601
     environment:
@@ -213,7 +220,6 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
-
 volumes:
   certs:
     driver: local
