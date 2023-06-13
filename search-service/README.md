@@ -7,3 +7,8 @@ First we start index on the dataset which are indexed in elastic search from mon
 Data from MongoDB are indexed to Elasticsearch using monstache
 
 monstache -f ./docker-compose/databases/products-service/config.toml -verbose
+
+Index files
+./sist2 scan ./files/ --output ../sist2-admin/documents.idx --very-verbose
+
+./sist2 index --es-url https://elastic:elastic@es01:9200 ../sist2-admin/documents.idx --es-insecure-ssl --very-verbose
