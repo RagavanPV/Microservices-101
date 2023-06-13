@@ -30,6 +30,7 @@ func main() {
     configs.ConnectDB()
 
     //routes
+    routes.HealthRouter(app)
     routes.ProductRouter(app)
 
     app.Listen(":6000")

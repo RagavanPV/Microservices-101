@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+    products-service:
+        image: products-service:latest
+        volumes:
+            - ./logs/:/logs/
+        ports:
+            - 6000:6000
+    auth-server:
+        image: auth-server:latest
+        volumes:
+            - ./logs/:/logs/
+        ports:
+            - 5001:5000
+        environment:
+            - MYSQL_USER=root
+            - MYSQL_PASSWORD=password1
+            - MYSQL_DB=authDB
+            - MYSQL_HOST=docker.host.internal
+            - E_COMMERCE_RELEASE_MYSQL_SERVICE_PORT=3306
+            - FLASK_ENV=development
+            - FLASK_DEBUG=True

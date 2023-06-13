@@ -1,0 +1,15 @@
+dependencies:
+- name: auth-server
+  repository: file://sub-charts/auth-server
+  version: 0.1.0
+- name: products-service
+  repository: file://sub-charts/products-service
+  version: 0.1.0
+- name: mysql
+  repository: https://helm.wso2.com
+  version: 1.6.9
+- name: mongodb
+  repository: https://charts.bitnami.com/bitnami
+  version: 13.10.1
+digest: sha256:abdba169b21d246c0d2b7b1368867f0830c2bcdcbe3f489cfc7979c307fec3ff
+generated: "2023-05-08T18:23:38.899179+05:30"

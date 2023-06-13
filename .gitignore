@@ -1,7 +1,7 @@
 .idea/*
 
-databases/products-mongo-data/**
-databases/auth-mysql-data/**
+docker-compose/databases/products-mongo-data/**
+docker-compose/databases/auth-mysql-data/**
 
 **/.DS_Store
 **.log
