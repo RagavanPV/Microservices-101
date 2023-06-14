@@ -10,15 +10,15 @@ services:
     networks:
       - mongors-network
     ports:
-      - 27021:27017
+      - ${MONGO_PORT_1}:27017
     environment:
       - PUID=1000
       - PGID=1000
       - MONGODB_REPLICA_SET_MODE=primary
-      - MONGODB_REPLICA_SET_KEY=replicasetkey123
-      - MONGODB_PORT_NUMBER=27021
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=admin
+      - MONGODB_REPLICA_SET_KEY=${MONGO_REPLICASET_KEY}
+      - MONGODB_PORT_NUMBER=${MONGO_PORT_1}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
     links:
       - mongo2
       - mongo3
@@ -32,15 +32,15 @@ services:
     networks:
       - mongors-network
     ports:
-      - 27022:27017
+      - ${MONGO_PORT_2}:27017
     environment:
       - PUID=1000
       - PGID=1000
       - MONGODB_REPLICA_SET_MODE=secondary
-      - MONGODB_REPLICA_SET_KEY=replicasetkey123
-      - MONGODB_PORT_NUMBER=27022
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=admin
+      - MONGODB_REPLICA_SET_KEY=${MONGO_REPLICASET_KEY}
+      - MONGODB_PORT_NUMBER=${MONGO_PORT_2}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
     restart: always
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
   mongo3:
@@ -51,24 +51,24 @@ services:
     networks:
       - mongors-network
     ports:
-      - 27023:27017
+      - ${MONGO_PORT_3}:27017
     environment:
       - PUID=1000
       - PGID=1000
       - MONGODB_REPLICA_SET_MODE=secondary
-      - MONGODB_REPLICA_SET_KEY=replicasetkey123
-      - MONGODB_PORT_NUMBER=27023
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=admin
+      - MONGODB_REPLICA_SET_KEY=${MONGO_REPLICASET_KEY}
+      - MONGODB_PORT_NUMBER=${MONGO_PORT_3}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
     restart: always
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
   auth-mysql:
     container_name: auth-mysql
     image: mysql:5.7
     ports:
-      - '3306:3306'
+      - ${MYSQL_PORT}:3306
     environment:
-      MYSQL_ROOT_PASSWORD: password1
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     networks:
       - mysql-network
     restart: unless-stopped
