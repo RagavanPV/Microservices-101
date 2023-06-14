@@ -3,6 +3,7 @@
 docker-compose/databases/data/**
 docker-compose/elastic-stack/certs/**
 docker-compose/elastic-stack/data/**
+docker-compose/real-time-migration/data/**
 
 **/.DS_Store
 **.log
