@@ -12,11 +12,3 @@ services:
       - 8080:8080 # sist2-admin
     working_dir: /root/sist2-admin/
     entrypoint: python3 /root/sist2-admin/sist2_admin/app.py
-
-  monstache:
-    hostname: monstache
-    image: rwynn/monstache
-    restart: always
-    volumes:
-      - ./monstache:/monstache-config-data/
-    command: monstache -f ./monstache-config-data/config.toml

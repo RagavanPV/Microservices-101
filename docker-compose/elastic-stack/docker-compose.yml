@@ -5,7 +5,6 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
       - ./certs/es-certs:/usr/share/elasticsearch/config/es-certs
-      - ./certs/kibana-certs:/usr/share/elasticsearch/config/kibana-certs
     user: "0"
     command: >
       bash -c '
@@ -46,12 +45,11 @@ services:
           > config/es-certs/instances.yml;
           bin/elasticsearch-certutil cert --silent --pem -out config/es-certs/certs.zip --in config/es-certs/instances.yml --ca-cert config/es-certs/ca/ca.crt --ca-key config/es-certs/ca/ca.key;
           unzip config/es-certs/certs.zip -d config/es-certs;
-          bin/elasticsearch-certutil cert --silent --pem -out config/kibana-certs/certs.zip --ca-cert config/kibana-certs/ca/ca.crt --ca-key config/kibana-certs/ca/ca.key;
-          unzip config/kibana-certs/certs.zip -d config/kibana-certs;
+          bin/elasticsearch-certutil cert --silent --pem -out config/es-certs/certs.zip --ca-cert config/es-certs/ca/ca.crt --ca-key config/es-certs/ca/ca.key;
+          unzip config/es-certs/certs.zip -d config/kesibana-certs;
         fi;
         echo "Setting file permissions"
         chown -R root:root config/es-certs;
-        chown -R root:root config/kibana-certs;
         find . -type d -exec chmod 750 \{\} \;;
         find . -type f -exec chmod 640 \{\} \;;
         echo "Waiting for Elasticsearch availability";
@@ -200,7 +198,7 @@ services:
         condition: service_healthy
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
     volumes:
-      - ./certs/kibana-certs:/usr/share/kibana/config/certs
+      - ./certs/es-certs:/usr/share/kibana/config/certs
       - ./data/kibana-data:/usr/share/kibana/data
     ports:
       - ${KIBANA_PORT}:5601

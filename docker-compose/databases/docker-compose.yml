@@ -6,7 +6,6 @@ services:
     volumes:
       - ./data/mongo/mongo1:/data/db
       - ./products-service/rs-init.sh:/scripts/rs-init.sh
-      - ./products-service/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     networks:
       - mongors-network
     ports:

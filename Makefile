@@ -27,7 +27,11 @@ start-dependencies:
 		cd docker-compose/databases/ && docker-compose -f docker-compose.yml up -d
 		cd docker-compose/elastic-stack/ && docker-compose -f docker-compose.yml up -d
 		cd docker-compose/real-time-migration/ && docker-compose -f docker-compose.yml up -d
+		docker exec mongo1 /scripts/rs-init.sh 
 destroy-dependencies:
 		cd docker-compose/databases/ && docker-compose -f docker-compose.yml down -v && rm -rf data/
 		cd docker-compose/elastic-stack/ && docker-compose -f docker-compose.yml down -v && rm -rf data/ certs/
 		cd docker-compose/real-time-migration/ && docker-compose -f docker-compose.yml down -v && rm -rf data/
+load-data:
+		./scripts/mongo-import-seed.sh
+		monstache -f ./docker-compose/real-time-migration/monstache/config.toml -verbose

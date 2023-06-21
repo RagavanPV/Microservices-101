@@ -24,4 +24,33 @@ var config = {
 };
 rs.initiate(config, { force: true });
 rs.status();
+exit;
+EOF
+mongosh <<EOF
+db = new Mongo().getDB("admin");
+db.createUser({
+    user: 'root',
+    pwd: 'root',
+    roles: [
+        {
+            role: 'readWrite',
+            db: 'productsDB',
+        },
+    ],
+});
+
+db.createUser({
+    user: 'admin',
+    pwd: 'admin',
+    roles: [
+        {
+            role: 'readWrite',
+            db: 'productsDB',
+        },
+    ],
+});
+
+db = new Mongo().getDB("productsDB");
+
+db.createCollection('products', { capped: false });
 EOF

@@ -37,7 +37,7 @@ elasticsearch-password = "elastic"
 # use 4 go routines concurrently pushing documents to Elasticsearch
 elasticsearch-max-conns = 4 
 # use the following PEM file to connections to Elasticsearch
-elasticsearch-pem-file = "/Users/apple/Ragavan/Learning/E-Commerce/docker-compose/elastic-stack/es-certs/ca/ca.crt"
+elasticsearch-pem-file = "/Users/apple/Ragavan/Learning/E-Commerce/docker-compose/elastic-stack/certs/es-certs/ca/ca.crt"
 # validate connections to Elasticsearch
 # propogate dropped collections in MongoDB as index deletes in Elasticsearch
 dropped-collections = true

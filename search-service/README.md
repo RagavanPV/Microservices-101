@@ -9,6 +9,6 @@ Data from MongoDB are indexed to Elasticsearch using monstache
 monstache -f ./docker-compose/databases/products-service/config.toml -verbose
 
 Index files
-./sist2 scan ./files/ --output ../sist2-admin/documents.idx --very-verbose
+./sist2 scan ../sist2-admin/data/ --output ../sist2-admin/documents.idx --very-verbose
 
-./sist2 index --es-url https://elastic:elastic@es01:9200 ../sist2-admin/documents.idx --es-insecure-ssl --very-verbose
+./sist2 index --es-url https://elastic:elastic@es01:9200 ./documents.idx --es-insecure-ssl --very-verbose
